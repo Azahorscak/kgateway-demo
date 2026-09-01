@@ -1,0 +1,14 @@
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayTrafficPolicy
+metadata:
+  name: opa-auth
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  entExtAuth:
+    authConfigRef:
+      name: opa-auth
+      namespace: httpbin

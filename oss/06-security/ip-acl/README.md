@@ -1,6 +1,8 @@
 # IP access control
 
-Rules are evaluated in order; the last match wins, so a broad allow can be
-narrowed by a later deny.
+Rules use longest-prefix matching, so the order you list them in does not
+matter — the most specific CIDR always wins. That is what lets you punch a hole
+in a broad rule: deny `10.0.0.0/8` and allow `10.1.0.0/16` in the same policy,
+and the `/16` wins for addresses inside it.
 
 Docs: <https://kgateway.dev/docs/envoy/latest/security/acl/>

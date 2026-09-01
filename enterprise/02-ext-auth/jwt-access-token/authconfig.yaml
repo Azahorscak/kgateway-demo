@@ -1,5 +1,9 @@
-# Machine-to-machine: the client already holds a token, so validate it and
-# optionally introspect it. No browser redirect.
+# Machine-to-machine: the client already holds a token, so validate it. No
+# browser redirect.
+#
+# accessTokenValidation takes exactly one of `jwt`, `introspection`, or the
+# deprecated `introspectionUrl`. This one uses introspection, so it works for
+# opaque tokens as well as JWTs.
 apiVersion: extauth.solo.io/v1
 kind: AuthConfig
 metadata:
@@ -15,7 +19,9 @@ spec:
           clientSecretRef:
             name: oidc-client-secret
             namespace: httpbin
-        scopeValidation:
-          requiredScopes:
+        # Require every listed scope. Applies to opaque and JWT tokens alike.
+        requiredScopes:
+          scope:
           - read
+        # Defaults to 10 minutes. Zero disables caching.
         cacheTimeout: 60s

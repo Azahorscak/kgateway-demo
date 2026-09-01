@@ -1,0 +1,27 @@
+# PortalParameters holds the operational config for the portal web server.
+# `store.memory` is fine for a demo — the data is lost on restart. Production
+# uses PostgreSQL.
+apiVersion: portal.solo.io/v1alpha1
+kind: PortalParameters
+metadata:
+  name: portal-params
+  namespace: httpbin
+spec:
+  store:
+    memory: {}
+---
+# Creating a Portal makes the controller deploy a portal backend web server
+# (Deployment/Service named portal-<name>) that serves the catalog over REST.
+# The browsable UI is a separate frontend app you build and point at it.
+apiVersion: portal.solo.io/v1alpha1
+kind: Portal
+metadata:
+  name: my-portal
+  namespace: httpbin
+spec:
+  parametersRef:
+    name: portal-params
+  visibility:
+    public: true
+  apiProductRefs:
+  - name: httpbin-api

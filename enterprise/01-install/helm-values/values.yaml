@@ -1,24 +1,40 @@
-# Values for the enterprise-kgateway Helm chart, installed on top of (or in
-# place of) the OSS kgateway chart:
+# Values for the enterprise-kgateway Helm chart. There are two charts: the CRDs
+# go on first, then the control plane.
 #
-#   helm upgrade -i enterprise-kgateway \
+#   helm upgrade -i --create-namespace -n kgateway-system \
+#     --version 2.3.2 enterprise-kgateway-crds \
+#     oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway-crds
+#
+#   helm upgrade -i -n kgateway-system enterprise-kgateway \
 #     oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway \
-#     -n kgateway-system --version <version> \
-#     --set-string licensing.licenseKey=$LICENSE_KEY \
+#     --version 2.3.2 \
+#     --set licensing.licenseKey=$LICENSE_KEY \
 #     -f values.yaml
 #
-# Prefer --set-string licensing.licenseKey=$LICENSE_KEY over committing the key.
+# The Gateway API CRDs are a prerequisite. Use the experimental channel if you
+# want TCPRoute, TLSRoute or ListenerSet.
+#
+# Prefer --set licensing.licenseKey=$LICENSE_KEY over committing the key.
 licensing:
-  licenseKey: ""
+  # Or pre-create the Secret yourself and set createSecret: false with
+  # secretName pointing at it.
+  createSecret: true
+  secretName: enterprise-kgateway-license
+  licenseKey: null
 
-# The ext auth and rate limit servers are deployed per GatewayClass, and only
-# once the first Gateway for that class exists.
-extAuthService:
-  enabled: true
+controller:
+  replicaCount: 1
+  logLevel: info
 
-rateLimitService:
-  enabled: true
-
-# Redis backs rate limit counters and OIDC session storage.
-redis:
-  enabled: true
+# The ext auth, rate limit, Redis and WAF servers are NOT Helm values. They are
+# shared extensions, configured on an EnterpriseKgatewayParameters resource that
+# a GatewayClass points at, and deployed per GatewayClass once the first Gateway
+# for that class exists. See ../enterprise-gateway-parameters/.
+#
+# This is the one Helm value that touches them: it wires a default
+# GatewayParameters/EnterpriseKgatewayParameters onto a managed GatewayClass, so
+# you do not have to edit the GatewayClass by hand.
+gatewayClassParametersRefs: {}
+#  enterprise-kgateway:
+#    name: ent-gw-params
+#    namespace: kgateway-system
