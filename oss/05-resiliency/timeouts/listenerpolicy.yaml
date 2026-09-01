@@ -1,0 +1,14 @@
+# Connection idle timeout for every route on the listener.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: idle-timeout
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      idleTimeout: 30s

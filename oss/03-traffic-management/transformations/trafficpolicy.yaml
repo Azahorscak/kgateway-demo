@@ -1,0 +1,23 @@
+# Inja templating: copy a request header onto the response and add a literal.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: transformation
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  transformation:
+    request:
+      set:
+      - name: x-request-id-copy
+        value: '{{ request_header("x-request-id") }}'
+    response:
+      set:
+      - name: x-pod-name
+        value: '{{ env("POD_NAME") }}'
+      body:
+        parseAs: AsJson
+        value: '{"title": "{{ slideshow.title }}"}'

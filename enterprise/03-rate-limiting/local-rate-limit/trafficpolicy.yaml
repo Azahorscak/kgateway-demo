@@ -1,0 +1,18 @@
+# Per-replica token bucket, same field as OSS — no rate limit server involved.
+# Use it as a cheap first line of defence in front of the global limit.
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayTrafficPolicy
+metadata:
+  name: local-ratelimit
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 100
+        tokensPerFill: 100
+        fillInterval: 1s

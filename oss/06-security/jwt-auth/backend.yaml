@@ -1,0 +1,12 @@
+# The JWKS endpoint is outside the cluster, so it needs a Backend to route to.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: keycloak
+  namespace: kgateway-system
+spec:
+  type: Static
+  static:
+    hosts:
+    - host: keycloak.example.com
+      port: 443

@@ -1,0 +1,38 @@
+# The two members of the failover pair.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: httpbin-backend
+  namespace: httpbin
+spec:
+  type: Static
+  static:
+    hosts:
+    - host: httpbin.httpbin.svc.cluster.local
+      port: 8000
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: hello-world-backend
+  namespace: httpbin
+spec:
+  type: Static
+  static:
+    hosts:
+    - host: hello-world.httpbin.svc.cluster.local
+      port: 80
+---
+# Group 0 takes all traffic; group 1 is used only when group 0 has no healthy
+# endpoints.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: failover-backend
+  namespace: httpbin
+spec:
+  priorityGroups:
+  - backendRefs:
+    - name: httpbin-backend
+  - backendRefs:
+    - name: hello-world-backend

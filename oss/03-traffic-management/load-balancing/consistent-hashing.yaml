@@ -1,0 +1,20 @@
+# Ring hash: requests with the same x-user-id always reach the same pod.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: httpbin-hash
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: httpbin
+  loadBalancer:
+    ringHash:
+      minimumRingSize: 1024
+      maximumRingSize: 2048
+      hashPolicies:
+      - header:
+          name: x-user-id
+        terminal: true
+    closeConnectionsOnHostSetChange: true

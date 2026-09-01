@@ -1,0 +1,18 @@
+# TLS is NOT terminated: the gateway reads SNI and passes the connection through.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tls-passthrough
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - name: tls
+    protocol: TLS
+    port: 8443
+    hostname: nginx.example.com
+    tls:
+      mode: Passthrough
+    allowedRoutes:
+      namespaces:
+        from: All

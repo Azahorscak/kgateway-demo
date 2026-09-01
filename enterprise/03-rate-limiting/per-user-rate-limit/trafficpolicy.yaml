@@ -1,0 +1,15 @@
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayTrafficPolicy
+metadata:
+  name: per-user-ratelimit
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  entRateLimit:
+    global:
+      rateLimitConfigRefs:
+      - name: per-user-ratelimit
+        namespace: kgateway-system

@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tcp-gateway
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - name: tcp
+    protocol: TCP
+    port: 8000
+    allowedRoutes:
+      kinds:
+      - kind: TCPRoute

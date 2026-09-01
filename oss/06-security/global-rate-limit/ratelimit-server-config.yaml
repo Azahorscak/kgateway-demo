@@ -1,0 +1,17 @@
+# Config consumed by the rate limit server itself, not by kgateway.
+# `domain` must match the GatewayExtension's domain.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ratelimit-config
+  namespace: kgateway-system
+data:
+  config.yaml: |
+    domain: api-gateway
+    descriptors:
+    - key: path
+      descriptors:
+      - key: X-User-ID
+        rate_limit:
+          unit: minute
+          requests_per_unit: 10

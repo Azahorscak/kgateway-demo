@@ -1,0 +1,14 @@
+# WAF is on for the whole Gateway (see ../owasp-crs). Turn it off for one route
+# — for example a file-upload endpoint that trips the request body rules.
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayTrafficPolicy
+metadata:
+  name: waf-disabled
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-uploads
+  entWAF:
+    disable: {}

@@ -1,0 +1,14 @@
+# For public endpoints, trust the system CA bundle instead of your own.
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: httpbin-org
+  namespace: default
+spec:
+  targetRefs:
+  - group: gateway.kgateway.dev
+    kind: Backend
+    name: httpbin-org
+  validation:
+    hostname: httpbin.org
+    wellKnownCACertificates: System

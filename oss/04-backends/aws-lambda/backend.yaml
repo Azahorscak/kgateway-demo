@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds
+  namespace: kgateway-system
+type: Opaque
+stringData:
+  accessKey: "<AWS_ACCESS_KEY_ID>"
+  secretKey: "<AWS_SECRET_ACCESS_KEY>"
+  sessionToken: ""
+---
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: lambda
+  namespace: kgateway-system
+spec:
+  type: AWS
+  aws:
+    region: us-east-1
+    accountId: "111122223333"
+    auth:
+      type: Secret
+      secretRef:
+        name: aws-creds
+    lambda:
+      functionName: echo

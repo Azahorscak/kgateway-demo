@@ -1,0 +1,20 @@
+# Default-deny allowlist: only the listed CIDRs get through.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: acl-allowlist
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  acl:
+    defaultAction: deny
+    denyResponse:
+      statusCode: 403
+    rules:
+    - name: allow-corp
+      cidrs:
+      - 203.0.113.0/24
+      action: allow

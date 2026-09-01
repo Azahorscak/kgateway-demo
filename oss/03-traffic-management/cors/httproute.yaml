@@ -1,0 +1,33 @@
+# CORS as a built-in Gateway API filter on one route rule.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-cors
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - cors.example
+  rules:
+  - filters:
+    - type: CORS
+      cors:
+        allowCredentials: true
+        allowOrigins:
+        - https://example.com
+        allowMethods:
+        - GET
+        - POST
+        - OPTIONS
+        allowHeaders:
+        - Origin
+        - Authorization
+        - Content-Type
+        exposeHeaders:
+        - Origin
+        maxAge: 86400
+    backendRefs:
+    - name: httpbin
+      port: 8000

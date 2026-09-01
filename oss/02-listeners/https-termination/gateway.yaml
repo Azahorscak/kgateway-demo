@@ -1,0 +1,20 @@
+# TLS is terminated at the gateway using a kubernetes.io/tls Secret.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: https
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: https
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: All

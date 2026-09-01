@@ -1,0 +1,12 @@
+apiVersion: extauth.solo.io/v1
+kind: AuthConfig
+metadata:
+  name: apikey-auth
+  namespace: httpbin
+spec:
+  configs:
+  - apiKeyAuth:
+      headerName: api-key
+      k8sSecretApikeyStorage:
+        labelSelector:
+          extauth: apikey

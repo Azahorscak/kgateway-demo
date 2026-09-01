@@ -1,0 +1,26 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-match
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - match.example
+  rules:
+  # All matchers inside one `matches` entry must hold (logical AND).
+  - matches:
+    - headers:
+      - type: Exact
+        name: version
+        value: v2
+      queryParams:
+      - type: Exact
+        name: user
+        value: me
+      method: GET
+    backendRefs:
+    - name: httpbin
+      port: 8000

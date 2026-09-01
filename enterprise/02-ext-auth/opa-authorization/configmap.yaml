@@ -1,0 +1,16 @@
+# Rego policy, loaded from a ConfigMap.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: allow-get-users
+  namespace: httpbin
+data:
+  policy.rego: |
+    package test
+
+    default allow = false
+
+    allow {
+      input.http_request.method == "GET"
+      startswith(input.http_request.path, "/api/users")
+    }

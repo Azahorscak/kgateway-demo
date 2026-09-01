@@ -1,0 +1,34 @@
+# Two HTTPS listeners share port 443 and are selected by SNI hostname,
+# each with its own certificate.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: sni
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - name: httpbin
+    protocol: HTTPS
+    port: 443
+    hostname: httpbin.example.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: httpbin-credential
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: All
+  - name: petstore
+    protocol: HTTPS
+    port: 443
+    hostname: petstore.example.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: petstore-credential
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: All

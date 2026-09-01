@@ -1,0 +1,22 @@
+# The Gateway API has a smaller built-in retry field. Use it when you do not
+# need retryOn conditions.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: retry
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - retry.example
+  rules:
+  - backendRefs:
+    - name: httpbin
+      port: 8000
+    retry:
+      attempts: 3
+      backoff: 1s
+    timeouts:
+      request: 20s

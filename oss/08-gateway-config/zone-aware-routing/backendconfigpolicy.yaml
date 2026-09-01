@@ -1,0 +1,18 @@
+# Prefer endpoints in the proxy's own zone, but only while the local zone has
+# at least minEndpointsThreshold healthy endpoints.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: httpbin-zone-aware
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: httpbin
+  loadBalancer:
+    roundRobin: {}
+    zoneAware:
+      preferLocal:
+        minEndpointsThreshold: 3
+        routingEnabled: 100

@@ -1,0 +1,15 @@
+# Coraza Seclang directives, compatible with ModSecurity v3. Custom rule IDs
+# must not collide with CRS, which uses 900000-999999.
+apiVersion: waf.solo.io/v1alpha1
+kind: WAFPolicy
+metadata:
+  name: custom-rules
+  namespace: kgateway-system
+spec:
+  ruleEngineSettings:
+    inline: |
+      SecRuleEngine On
+  customDirectives:
+  - inline: |
+      SecRule REQUEST_HEADERS:User-Agent "@streq scammer" \
+        "deny,status:403,id:107,phase:1,msg:'blocked scammer'"

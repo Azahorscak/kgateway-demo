@@ -1,0 +1,12 @@
+# Route to a host that has no Kubernetes Service.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: json-backend
+  namespace: default
+spec:
+  type: Static
+  static:
+    hosts:
+    - host: jsonplaceholder.typicode.com
+      port: 80

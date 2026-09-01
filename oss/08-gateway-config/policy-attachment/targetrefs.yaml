@@ -1,0 +1,52 @@
+# 1. Attach to a whole Gateway (every route on it).
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: whole-gateway
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 100
+        tokensPerFill: 100
+        fillInterval: 1s
+---
+# 2. Attach to one listener, using sectionName. The name must match a
+#    listener on that Gateway.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: one-listener
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+    sectionName: https
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 10
+        tokensPerFill: 10
+        fillInterval: 1s
+---
+# 3. Attach to one named rule of an HTTPRoute.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: one-rule
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+    sectionName: rule1
+  timeouts:
+    request: 5s

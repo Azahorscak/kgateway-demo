@@ -1,0 +1,30 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-route-echo
+  namespace: kgateway-system
+spec:
+  parentRefs:
+  - name: tcp-gateway
+    namespace: kgateway-system
+    sectionName: tcp
+  rules:
+  - backendRefs:
+    - name: tcp-echo
+      namespace: default
+      port: 1025
+---
+# Cross-namespace backendRef requires a ReferenceGrant in the target namespace.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-tcp-route-to-echo
+  namespace: default
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: TCPRoute
+    namespace: kgateway-system
+  to:
+  - group: ""
+    kind: Service

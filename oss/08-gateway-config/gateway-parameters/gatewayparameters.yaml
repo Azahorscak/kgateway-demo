@@ -1,0 +1,23 @@
+# Shapes the Envoy proxy deployment that kgateway creates for a Gateway.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: gw-params
+  namespace: kgateway-system
+spec:
+  kube:
+    service:
+      type: NodePort
+    envoyContainer:
+      bootstrap:
+        logLevel: info
+        logFormat:
+          json:
+            message: "%j"
+            level: "%l"
+            timestamp: "%Y-%m-%dT%T.%eZ"
+    # deploymentOverlay is a strategic-merge patch over the generated Deployment,
+    # for anything the typed fields do not cover.
+    deploymentOverlay:
+      spec:
+        minReadySeconds: 10

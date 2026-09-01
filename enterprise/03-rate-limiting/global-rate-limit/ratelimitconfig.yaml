@@ -1,0 +1,19 @@
+# The enterprise rate limit server is deployed for you. `actions` say what to
+# extract from the request; `descriptors` say what the limit is.
+apiVersion: ratelimit.solo.io/v1alpha1
+kind: RateLimitConfig
+metadata:
+  name: ratelimit-config
+  namespace: kgateway-system
+spec:
+  raw:
+    descriptors:
+    - key: generic_key
+      value: counter
+      rateLimit:
+        requestsPerUnit: 10
+        unit: MINUTE
+    rateLimits:
+    - actions:
+      - genericKey:
+          descriptorValue: counter

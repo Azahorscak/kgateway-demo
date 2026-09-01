@@ -1,0 +1,10 @@
+# The kgateway Helm chart installs this GatewayClass for you.
+# It is shown here so the demo set is self-describing: every Gateway in this
+# repo points at `gatewayClassName: kgateway`.
+# Docs: https://kgateway.dev/docs/envoy/latest/setup/default/
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kgateway
+spec:
+  controllerName: kgateway.dev/kgateway

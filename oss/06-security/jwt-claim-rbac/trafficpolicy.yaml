@@ -1,0 +1,20 @@
+# Authenticate the token, then authorize on its claims. The claims are read out
+# of the dynamic metadata that the JWT filter writes.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: jwt-rbac
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  jwtAuth:
+    extensionRef:
+      name: keycloak-jwt
+  rbac:
+    action: Allow
+    policy:
+      matchExpressions:
+      - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['team'] == 'dev'"

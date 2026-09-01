@@ -1,0 +1,14 @@
+# Superset of the OSS GatewayParameters. Adds config for the enterprise
+# sidecar services (ext auth, rate limit, cache).
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayParameters
+metadata:
+  name: ent-gw-params
+  namespace: kgateway-system
+spec:
+  extAuth:
+    deployment:
+      replicas: 2
+  rateLimit:
+    deployment:
+      replicas: 2

@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: oidc-client-secret
+  namespace: httpbin
+type: extauth.solo.io/oauth
+stringData:
+  client-secret: "<OIDC client secret>"
+---
+apiVersion: extauth.solo.io/v1
+kind: AuthConfig
+metadata:
+  name: oidc-authorization-code
+  namespace: httpbin
+spec:
+  configs:
+  - oauth2:
+      oidcAuthorizationCode:
+        appUrl: https://httpbin.example.com
+        callbackPath: /callback
+        issuerUrl: https://keycloak.example.com/realms/master/
+        clientId: my-app
+        clientSecretRef:
+          name: oidc-client-secret
+          namespace: httpbin
+        scopes:
+        - email
+        - profile
+        session:
+          failOnFetchFailure: true
+          # Server-side sessions keep the tokens out of the browser cookie.
+          redis:
+            cookieName: keycloak-session
+            options:
+              host: redis.kgateway-system.svc.cluster.local:6379
+        headers:
+          idTokenHeader: jwt

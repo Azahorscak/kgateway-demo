@@ -1,0 +1,21 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: httpbin-connection
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: httpbin
+  connectTimeout: 5s
+  perConnectionBufferLimitBytes: 1024
+  commonHttpProtocolOptions:
+    idleTimeout: 10s
+    maxHeadersCount: 15
+    maxStreamDuration: 30s
+    maxRequestsPerConnection: 100
+  tcpKeepalive:
+    keepAliveProbes: 3
+    keepAliveTime: 30s
+    keepAliveInterval: 5s
