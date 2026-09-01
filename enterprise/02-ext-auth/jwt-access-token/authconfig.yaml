@@ -1,0 +1,21 @@
+# Machine-to-machine: the client already holds a token, so validate it and
+# optionally introspect it. No browser redirect.
+apiVersion: extauth.solo.io/v1
+kind: AuthConfig
+metadata:
+  name: access-token
+  namespace: httpbin
+spec:
+  configs:
+  - oauth2:
+      accessTokenValidation:
+        introspection:
+          introspectionUrl: https://keycloak.example.com/realms/master/protocol/openid-connect/token/introspect
+          clientId: my-app
+          clientSecretRef:
+            name: oidc-client-secret
+            namespace: httpbin
+        scopeValidation:
+          requiredScopes:
+          - read
+        cacheTimeout: 60s

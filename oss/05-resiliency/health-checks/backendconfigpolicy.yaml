@@ -1,0 +1,18 @@
+# Active health checking: the gateway probes the backend on its own.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: httpbin-healthcheck
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: httpbin
+  healthCheck:
+    healthyThreshold: 1
+    unhealthyThreshold: 1
+    interval: 10s
+    timeout: 5s
+    http:
+      path: /status/200

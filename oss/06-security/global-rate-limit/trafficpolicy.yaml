@@ -1,0 +1,21 @@
+# Descriptors are what the gateway sends to the rate limit service; the limits
+# themselves live in that service's config (see ratelimit-server-config.yaml).
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: user-rate-limit
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  rateLimit:
+    global:
+      extensionRef:
+        name: global-ratelimit
+      descriptors:
+      - entries:
+        - type: Path
+        - type: Header
+          header: X-User-ID

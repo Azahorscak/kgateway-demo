@@ -1,0 +1,14 @@
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayTrafficPolicy
+metadata:
+  name: waf
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  entWAF:
+    wafPolicyRef:
+      name: owasp-crs
+      namespace: kgateway-system

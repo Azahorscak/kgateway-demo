@@ -1,0 +1,18 @@
+# Per-Envoy-instance token bucket. No external service needed, but the limit is
+# per gateway replica.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: local-ratelimit
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 10
+        tokensPerFill: 10
+        fillInterval: 1s

@@ -1,0 +1,17 @@
+# Strip a header on every request before routing happens, so a client can never
+# spoof it. Runs earlier than the HTTPRoute filter above.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: remove-header
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      earlyRequestHeaderModifier:
+        remove:
+        - x-user-id

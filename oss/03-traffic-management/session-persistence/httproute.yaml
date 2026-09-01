@@ -1,0 +1,22 @@
+# Gateway API session persistence: pin a client to one backend pod with a cookie.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-session
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - session.example
+  rules:
+  - backendRefs:
+    - name: httpbin
+      port: 8000
+    sessionPersistence:
+      sessionName: Session-A
+      type: Cookie
+      absoluteTimeout: 30m
+      cookieConfig:
+        lifetimeType: Permanent

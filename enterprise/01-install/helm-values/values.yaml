@@ -1,0 +1,24 @@
+# Values for the enterprise-kgateway Helm chart, installed on top of (or in
+# place of) the OSS kgateway chart:
+#
+#   helm upgrade -i enterprise-kgateway \
+#     oci://us-docker.pkg.dev/solo-public/enterprise-kgateway/charts/enterprise-kgateway \
+#     -n kgateway-system --version <version> \
+#     --set-string licensing.licenseKey=$LICENSE_KEY \
+#     -f values.yaml
+#
+# Prefer --set-string licensing.licenseKey=$LICENSE_KEY over committing the key.
+licensing:
+  licenseKey: ""
+
+# The ext auth and rate limit servers are deployed per GatewayClass, and only
+# once the first Gateway for that class exists.
+extAuthService:
+  enabled: true
+
+rateLimitService:
+  enabled: true
+
+# Redis backs rate limit counters and OIDC session storage.
+redis:
+  enabled: true

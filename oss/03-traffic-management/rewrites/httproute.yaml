@@ -1,0 +1,27 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-rewrite
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - rewrite.example
+  rules:
+  # /foo/anything -> /anything, and rewrite the Host header on the way out.
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /foo
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        hostname: httpbin.example
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: httpbin
+      port: 8000

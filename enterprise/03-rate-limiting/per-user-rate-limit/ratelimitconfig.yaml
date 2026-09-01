@@ -1,0 +1,19 @@
+# Limit each authenticated user separately: the descriptor key has no fixed
+# value, so the server keeps one counter per distinct header value.
+apiVersion: ratelimit.solo.io/v1alpha1
+kind: RateLimitConfig
+metadata:
+  name: per-user-ratelimit
+  namespace: kgateway-system
+spec:
+  raw:
+    descriptors:
+    - key: user-id
+      rateLimit:
+        requestsPerUnit: 100
+        unit: MINUTE
+    rateLimits:
+    - actions:
+      - requestHeaders:
+          descriptorKey: user-id
+          headerName: x-user-id

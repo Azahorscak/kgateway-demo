@@ -1,0 +1,31 @@
+# Mutual TLS: clients must present a certificate signed by the CA held in the
+# `ca-cert` ConfigMap. Client validation is set at the Gateway level under
+# spec.tls.frontend; the listener still terminates TLS with its own Secret.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: mtls
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  tls:
+    frontend:
+      default:
+        validation:
+          mode: AllowValidOnly
+          caCertificateRefs:
+          - name: ca-cert
+            kind: ConfigMap
+            group: ""
+  listeners:
+  - name: https-8443
+    protocol: HTTPS
+    port: 8443
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: https-cert
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: All

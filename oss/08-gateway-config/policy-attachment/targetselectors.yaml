@@ -1,0 +1,20 @@
+# 5. Attach by label instead of by name. Combined with the global policy
+#    namespace (Helm: controller.extraEnv.KGW_GLOBAL_POLICY_NAMESPACE), a
+#    platform team can publish policies that app teams opt into by labelling
+#    their routes.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: shared-transformation
+  namespace: kgateway-system
+spec:
+  targetSelectors:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    matchLabels:
+      global-policy: transformation
+  transformation:
+    response:
+      set:
+      - name: x-policy
+        value: shared

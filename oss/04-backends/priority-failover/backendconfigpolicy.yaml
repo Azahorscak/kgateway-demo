@@ -1,0 +1,23 @@
+# Failover needs active health checking to know a group is down.
+# healthyPanicThreshold: 0 stops Envoy from falling back to "send to everyone"
+# when the whole group is unhealthy.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: failover-healthcheck
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.kgateway.dev
+    kind: Backend
+    name: failover-backend
+  healthCheck:
+    healthyThreshold: 1
+    unhealthyThreshold: 1
+    interval: 5s
+    timeout: 2s
+    http:
+      path: /
+  loadBalancer:
+    healthyPanicThreshold: 0
+    roundRobin: {}

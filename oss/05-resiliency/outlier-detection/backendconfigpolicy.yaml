@@ -1,0 +1,16 @@
+# Passive health checking: eject an endpoint after consecutive 5xx responses.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: httpbin-outlier
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: httpbin
+  outlierDetection:
+    interval: 2s
+    consecutive5xx: 5
+    baseEjectionTime: 30s
+    maxEjectionPercent: 50

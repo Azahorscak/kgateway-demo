@@ -1,0 +1,15 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute
+  namespace: default
+spec:
+  parentRefs:
+  - name: tls-passthrough
+    namespace: kgateway-system
+  rules:
+  - backendRefs:
+    - group: ""
+      kind: Service
+      name: my-nginx
+      port: 443

@@ -1,0 +1,14 @@
+# Points kgateway at an external gRPC processing server. The Service must use
+# appProtocol: kubernetes.io/h2c.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: ext-proc-extension
+  namespace: kgateway-system
+spec:
+  type: ExtProc
+  extProc:
+    grpcService:
+      backendRef:
+        name: ext-proc-grpc
+        port: 4444

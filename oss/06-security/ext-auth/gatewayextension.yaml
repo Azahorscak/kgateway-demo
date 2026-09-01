@@ -1,0 +1,14 @@
+# Bring your own authorization server. `httpService` is also supported instead
+# of `grpcService`.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: basic-ext-auth
+  namespace: kgateway-system
+spec:
+  type: ExtAuth
+  extAuth:
+    grpcService:
+      backendRef:
+        name: ext-authz
+        port: 4444

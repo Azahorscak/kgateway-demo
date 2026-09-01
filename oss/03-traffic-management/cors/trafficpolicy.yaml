@@ -1,0 +1,25 @@
+# The same policy as a TrafficPolicy, so it can be reused across routes or
+# applied to a whole Gateway via targetRefs.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: httpbin-cors
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-cors
+  cors:
+    allowCredentials: true
+    allowOrigins:
+    - https://example.com
+    allowMethods:
+    - GET
+    - POST
+    - OPTIONS
+    allowHeaders:
+    - Origin
+    - Authorization
+    - Content-Type
+    maxAge: 86400

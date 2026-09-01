@@ -1,0 +1,27 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: tracing
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      tracing:
+        clientSampling: 100
+        randomSampling: 100
+        overallSampling: 100
+        provider:
+          openTelemetry:
+            grpcService:
+              backendRef:
+                name: otel-collector
+                namespace: kgateway-system
+                port: 4317
+        attributes:
+        - name: environment
+          literal:
+            value: production

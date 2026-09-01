@@ -1,0 +1,29 @@
+# Header changes that belong to a single route rule.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-headers
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - headers.example
+  rules:
+  - filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        add:
+        - name: x-route
+          value: httpbin
+        remove:
+        - x-internal
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: x-served-by
+          value: kgateway
+    backendRefs:
+    - name: httpbin
+      port: 8000

@@ -1,0 +1,17 @@
+# Caps on in-flight work per backend. Requests over the limit fail fast with
+# 503 instead of queueing.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: httpbin-circuit-breakers
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: httpbin
+  circuitBreakers:
+    maxConnections: 1000
+    maxPendingRequests: 500
+    maxRequests: 2000
+    maxRetries: 10

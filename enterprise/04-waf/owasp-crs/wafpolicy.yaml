@@ -1,0 +1,14 @@
+# OWASP Core Rule Set. The engine must be switched on explicitly, and CRS needs
+# crs_setup_version set in phase 1 with an ID in the 900xxx range.
+apiVersion: waf.solo.io/v1alpha1
+kind: WAFPolicy
+metadata:
+  name: owasp-crs
+  namespace: kgateway-system
+spec:
+  ruleEngineSettings:
+    inline: |
+      SecRuleEngine On
+      SecAction "id:900000,phase:1,pass,nolog,setvar:tx.crs_setup_version=4"
+  coreRuleSet:
+    settings: {}

@@ -1,0 +1,31 @@
+# Delay half the requests by 5s.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: httpbin-delay
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  faultInjection:
+    delay:
+      fixedDelay: 5s
+      percentage: 50
+---
+# Fail every request with 503.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: httpbin-abort
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  faultInjection:
+    abort:
+      httpStatus: 503
+      percentage: 100

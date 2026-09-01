@@ -1,0 +1,17 @@
+# Points at an Envoy-compatible rate limit service (for example the upstream
+# envoyproxy/ratelimit server backed by Redis).
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: global-ratelimit
+  namespace: kgateway-system
+spec:
+  type: RateLimit
+  rateLimit:
+    grpcService:
+      backendRef:
+        name: ratelimit
+        port: 8081
+    domain: api-gateway
+    timeout: 100ms
+    failOpen: false

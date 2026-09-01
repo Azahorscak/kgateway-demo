@@ -1,0 +1,27 @@
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: access-logs
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      accessLog:
+      - fileSink:
+          path: /dev/stdout
+          jsonFormat:
+            start_time: "%START_TIME%"
+            method: "%REQ(:METHOD)%"
+            path: "%REQ(:PATH)%"
+            authority: "%REQ(:AUTHORITY)%"
+            protocol: "%PROTOCOL%"
+            response_code: "%RESPONSE_CODE%"
+            response_flags: "%RESPONSE_FLAGS%"
+            duration: "%DURATION%"
+            upstream_host: "%UPSTREAM_HOST%"
+            upstream_cluster: "%UPSTREAM_CLUSTER%"
+            request_id: "%REQ(X-REQUEST-ID)%"

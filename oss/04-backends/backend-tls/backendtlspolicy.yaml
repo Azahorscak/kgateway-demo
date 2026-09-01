@@ -1,0 +1,17 @@
+# Gateway -> backend TLS, verified against a CA in a ConfigMap.
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: nginx-tls-policy
+  namespace: default
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  validation:
+    hostname: example.com
+    caCertificateRefs:
+    - group: ""
+      kind: ConfigMap
+      name: ca

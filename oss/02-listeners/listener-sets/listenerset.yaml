@@ -1,0 +1,44 @@
+# An XListenerSet lets a team add listeners to a Gateway they do not own.
+# The parent Gateway must opt in with spec.allowedListeners.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: https
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  allowedListeners:
+    namespaces:
+      from: All
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: All
+---
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: my-https-listenerset
+  namespace: kgateway-system
+spec:
+  parentRef:
+    name: https
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - name: https-listener-set
+    protocol: HTTPS
+    port: 443
+    hostname: https.example.com
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - name: https
+        kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: All

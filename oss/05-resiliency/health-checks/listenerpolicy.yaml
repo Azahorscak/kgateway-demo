@@ -1,0 +1,16 @@
+# A health-check endpoint on the gateway itself, for an external load balancer
+# to probe.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: gateway-healthcheck
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      healthCheck:
+        path: /healthz

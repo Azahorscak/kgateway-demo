@@ -1,0 +1,17 @@
+# Tell the proxy which zone it is in.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: zone-aware-gw-params
+  namespace: kgateway-system
+spec:
+  kube:
+    podTemplate:
+      nodeSelector:
+        topology.kubernetes.io/zone: us-east-1a
+    envoyContainer:
+      env:
+      - name: KGATEWAY_NODE_REGION
+        value: us-east-1
+      - name: KGATEWAY_NODE_ZONE
+        value: us-east-1a

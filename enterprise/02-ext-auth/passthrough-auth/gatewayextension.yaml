@@ -1,0 +1,14 @@
+# Enterprise ext auth delegating to your own gRPC auth server, so custom auth
+# can sit alongside the built-in methods.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: passthrough-auth
+  namespace: kgateway-system
+spec:
+  type: ExtAuth
+  extAuth:
+    grpcService:
+      backendRef:
+        name: my-auth-server
+        port: 9001

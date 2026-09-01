@@ -1,0 +1,12 @@
+apiVersion: extauth.solo.io/v1
+kind: AuthConfig
+metadata:
+  name: opa-auth
+  namespace: httpbin
+spec:
+  configs:
+  - opaAuth:
+      modules:
+      - name: allow-get-users
+        namespace: httpbin
+      query: "data.test.allow == true"

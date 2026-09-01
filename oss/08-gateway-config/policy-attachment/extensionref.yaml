@@ -1,0 +1,21 @@
+# 4. Attach from the route side instead: the HTTPRoute rule names the policy.
+#    Use this when the route author, not the policy author, should decide.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  rules:
+  - filters:
+    - type: ExtensionRef
+      extensionRef:
+        group: gateway.kgateway.dev
+        kind: TrafficPolicy
+        name: one-rule
+    backendRefs:
+    - name: httpbin
+      port: 8000

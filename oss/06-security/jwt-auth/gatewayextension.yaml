@@ -1,0 +1,26 @@
+# A JWT provider. Use `local.inline` for a static JWKS, or `remote` to fetch it
+# from the issuer.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: keycloak-jwt
+  namespace: kgateway-system
+spec:
+  jwt:
+    providers:
+    - name: keycloak
+      issuer: https://keycloak.example.com/realms/master
+      audiences:
+      - my-api
+      jwks:
+        remote:
+          url: https://keycloak.example.com/realms/master/protocol/openid-connect/certs
+          backendRef:
+            name: keycloak
+            kind: Backend
+            group: gateway.kgateway.dev
+          cacheDuration: 10m
+      # Copy claims into request headers for the backend to read.
+      claimsToHeaders:
+      - name: team
+        header: x-team
