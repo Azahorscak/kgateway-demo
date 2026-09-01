@@ -1,5 +1,8 @@
-# An XListenerSet lets a team add listeners to a Gateway they do not own.
+# A ListenerSet lets a team add listeners to a Gateway they do not own.
 # The parent Gateway must opt in with spec.allowedListeners.
+#
+# ListenerSet is in the Gateway API *experimental* channel, so it needs
+# experimental-install.yaml, not standard-install.yaml.
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -10,6 +13,9 @@ spec:
   allowedListeners:
     namespaces:
       from: All
+  # GEP-1713 requires at least one listener on the Gateway itself, even when
+  # every real listener comes from a ListenerSet. This one is a placeholder and
+  # must not collide with the ListenerSet's port or name.
   listeners:
   - name: https
     protocol: HTTPS
@@ -18,8 +24,8 @@ spec:
       namespaces:
         from: All
 ---
-apiVersion: gateway.networking.x-k8s.io/v1alpha1
-kind: XListenerSet
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
 metadata:
   name: my-https-listenerset
   namespace: kgateway-system
@@ -42,3 +48,20 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
+---
+# Routes attach to the ListenerSet, not to the Gateway.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-https
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: my-https-listenerset
+    namespace: kgateway-system
+    kind: ListenerSet
+    group: gateway.networking.k8s.io
+  rules:
+  - backendRefs:
+    - name: httpbin
+      port: 8000

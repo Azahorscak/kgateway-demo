@@ -1,0 +1,24 @@
+# An ApiDoc pairs an OpenAPI schema with the backend it describes. The schema
+# can be inline (`source.manual`), fetched from a URL (`source.url`, which also
+# needs `servedBy`), or discovered from an in-cluster service.
+apiVersion: portal.solo.io/v1alpha1
+kind: ApiDoc
+metadata:
+  name: httpbin-apidoc
+  namespace: httpbin
+spec:
+  source:
+    manual:
+      content: |
+        {
+          "openapi": "3.0.0",
+          "info": { "title": "httpbin", "version": "1.0.0" },
+          "paths": {
+            "/get": {
+              "get": {
+                "summary": "Return the request",
+                "responses": { "200": { "description": "OK" } }
+              }
+            }
+          }
+        }

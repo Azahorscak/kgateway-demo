@@ -35,7 +35,7 @@ Names, ports, and hostnames are consistent across examples: the gateway is
 | Resource | Group | What it does |
 |--|--|--|
 | `Gateway`, `HTTPRoute`, `TCPRoute`, `TLSRoute` | `gateway.networking.k8s.io` | Kubernetes Gateway API: listeners and routing |
-| `XListenerSet` | `gateway.networking.x-k8s.io` | add listeners to a Gateway you do not own |
+| `ListenerSet` | `gateway.networking.k8s.io` | add listeners to a Gateway you do not own (experimental channel) |
 | `TrafficPolicy` | `gateway.kgateway.dev` | per-route/gateway policy: transformations, rate limit, auth, CORS, retries |
 | `ListenerPolicy` | `gateway.kgateway.dev` | per-listener policy: access logs, tracing, timeouts, header handling |
 | `BackendConfigPolicy` | `gateway.kgateway.dev` | per-backend policy: load balancing, health checks, circuit breakers |
@@ -44,19 +44,27 @@ Names, ports, and hostnames are consistent across examples: the gateway is
 | `GatewayParameters` | `gateway.kgateway.dev` | how the Envoy proxy deployment itself is built |
 | `DirectResponse` | `gateway.kgateway.dev` | answer at the gateway with a fixed status and body |
 
-`ListenerPolicy` was called `HTTPListenerPolicy` before kgateway 2.2.
+`ListenerPolicy` arrived in kgateway 2.2. The older `HTTPListenerPolicy` still
+exists and still works, but it is deprecated — everything it configured now lives
+under `ListenerPolicy`'s `default.httpSettings` (or `perPort[].listener.httpSettings`),
+and `ListenerPolicy` also covers the non-HTTP listener settings.
 
 ## Versions
 
-Written against kgateway 2.x (`latest` docs) and Solo Enterprise for kgateway
-2.x. Field names do move between minor versions — check the API reference for
-the version you run:
+Checked against the kgateway `latest` docs (2.4.x) and the Solo Enterprise for
+kgateway `latest` docs (2.3.x). Field names do move between minor versions —
+check the API reference for the version you actually run:
 
 - OSS: <https://kgateway.dev/docs/envoy/latest/reference/api/>
-- Enterprise: <https://docs.solo.io/kgateway/latest/>
+- Enterprise: <https://docs.solo.io/kgateway/latest/reference/api/solo/>
+
+Two deprecations to know about at 2.4.x: `GatewayExtension.spec.type` and
+`Backend.spec.type` are ignored — the kind is inferred from whichever config
+block you set. The examples here still set them, because they read better and
+older versions require them.
 
 ## AI / agent workloads
 
 Not covered here. kgateway's AI gateway, MCP, and LLM routing moved to the
-separate [agentgateway](https://agentgateway.dev/docs) project, which kgateway
-can drive as a data plane via `gatewayClassName: agentgateway`.
+separate [agentgateway](https://agentgateway.dev/docs/kubernetes/latest/) project,
+which has its own control plane and GatewayClass (`gatewayClassName: agentgateway`).

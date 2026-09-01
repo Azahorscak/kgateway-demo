@@ -6,7 +6,7 @@ metadata:
 spec:
   configs:
   - apiKeyAuth:
+      # Optional; defaults to api-key.
       headerName: api-key
-      k8sSecretApikeyStorage:
-        labelSelector:
-          extauth: apikey
+      labelSelector:
+        extauth: apikey

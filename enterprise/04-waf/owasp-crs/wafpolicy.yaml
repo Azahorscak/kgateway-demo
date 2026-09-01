@@ -1,5 +1,10 @@
-# OWASP Core Rule Set. The engine must be switched on explicitly, and CRS needs
-# crs_setup_version set in phase 1 with an ID in the 900xxx range.
+# OWASP Core Rule Set. Solo Enterprise for kgateway bundles CRS v4.
+#
+# Two things are mandatory:
+#  - ruleEngineSettings must switch the Coraza engine on.
+#  - coreRuleSet.settings must run the CRS initialisation action (id 900990),
+#    which sets tx.crs_setup_version. Without it, CRS rule 901001 blocks every
+#    request.
 apiVersion: waf.solo.io/v1alpha1
 kind: WAFPolicy
 metadata:
@@ -9,6 +14,16 @@ spec:
   ruleEngineSettings:
     inline: |
       SecRuleEngine On
-      SecAction "id:900000,phase:1,pass,nolog,setvar:tx.crs_setup_version=4"
   coreRuleSet:
-    settings: {}
+    settings:
+      inline: |
+        SecDefaultAction "phase:1,log,auditlog,deny,status:403"
+        SecDefaultAction "phase:2,log,auditlog,deny,status:403"
+        SecAction "id:900990,phase:1,pass,t:none,nolog,tag:'OWASP_CRS',ver:'OWASP_CRS/4.23.0',setvar:tx.crs_setup_version=4230"
+  customDirectives:
+  # 913100 flags scanner User-Agents. 920430 checks the HTTP protocol version,
+  # which the ExtProc integration does not forward — leaving it on can deny
+  # every request.
+  - inline: |
+      SecRuleRemoveById 913100
+      SecRuleRemoveById 920430

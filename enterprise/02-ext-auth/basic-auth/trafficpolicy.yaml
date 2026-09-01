@@ -1,3 +1,9 @@
+# Basic auth is a first-class field on the policy — no AuthConfig, and no call
+# out to the ext auth server. Passwords are htpasswd SHA-1 hashes; SHA-1 is the
+# only format accepted.
+#
+#   htpasswd -nbs user password
+#   user:{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=
 apiVersion: enterprisekgateway.solo.io/v1alpha1
 kind: EnterpriseKgatewayTrafficPolicy
 metadata:
@@ -8,7 +14,28 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     name: http
-  entExtAuth:
-    authConfigRef:
-      name: basic-auth
-      namespace: httpbin
+  basicAuth:
+    users:
+    - "admin:{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g="
+    - "developer:{SHA}QL0AFWMIX8NRZTKeof9cXsvbvu8="
+---
+# Instead of listing users inline, point at a Secret holding htpasswd data.
+# The Secret key defaults to `.htpasswd`.
+#
+#   basicAuth:
+#     secretRef:
+#       name: basic-auth-users
+#
+# And to exempt one route from a gateway-wide policy:
+apiVersion: enterprisekgateway.solo.io/v1alpha1
+kind: EnterpriseKgatewayTrafficPolicy
+metadata:
+  name: basic-auth-disable
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  basicAuth:
+    disable: {}

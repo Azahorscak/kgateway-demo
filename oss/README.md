@@ -17,8 +17,12 @@
 by what the policy does:
 
 - targeting a route or a Gateway → `TrafficPolicy`
-- targeting a listener → `ListenerPolicy`
+- targeting the Gateway's listeners → `ListenerPolicy`
 - targeting a backend (Service or `Backend`) → `BackendConfigPolicy`
+
+`ListenerPolicy` only accepts `Gateway` in its `targetRefs` — you narrow it to
+individual listeners with `targetRefs.sectionName`, or to a port with
+`spec.perPort` instead of `spec.default`.
 
 That is why retries live on a `TrafficPolicy` but circuit breakers live on a
 `BackendConfigPolicy` — a retry is a property of a request, a circuit breaker is

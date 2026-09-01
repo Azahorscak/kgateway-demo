@@ -1,14 +1,25 @@
-# Superset of the OSS GatewayParameters. Adds config for the enterprise
-# sidecar services (ext auth, rate limit, cache).
+# Superset of the OSS GatewayParameters: spec.kube inherits every OSS field
+# (deployment, service, podTemplate, overlays, ...) and adds sharedExtensions
+# for the enterprise servers.
+#
+# The extensions are deployed per GatewayClass, once the first Gateway for that
+# class exists. WAF is off unless you enable it here.
 apiVersion: enterprisekgateway.solo.io/v1alpha1
 kind: EnterpriseKgatewayParameters
 metadata:
   name: ent-gw-params
   namespace: kgateway-system
 spec:
-  extAuth:
-    deployment:
-      replicas: 2
-  rateLimit:
-    deployment:
-      replicas: 2
+  kube:
+    sharedExtensions:
+      extauth:
+        enabled: true
+        replicas: 2
+      ratelimiter:
+        enabled: true
+        replicas: 2
+      # Redis, backing rate limit counters and OIDC session storage.
+      extCache:
+        enabled: true
+      waf:
+        enabled: true

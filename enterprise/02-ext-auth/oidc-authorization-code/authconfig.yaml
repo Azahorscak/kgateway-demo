@@ -29,9 +29,11 @@ spec:
         session:
           failOnFetchFailure: true
           # Server-side sessions keep the tokens out of the browser cookie.
+          # The Redis the ext auth server already has is named
+          # ext-cache-<gateway-class-name>.
           redis:
             cookieName: keycloak-session
             options:
-              host: redis.kgateway-system.svc.cluster.local:6379
+              host: ext-cache-enterprise-kgateway:6379
         headers:
           idTokenHeader: jwt

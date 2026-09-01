@@ -1,12 +1,19 @@
-# Referencing the parameters from the GatewayClass makes them the default for
-# every Gateway of that class. A Gateway can still override with its own
-# spec.infrastructure.parametersRef.
+# The enterprise install creates this GatewayClass for you. It is shown here
+# because attaching EnterpriseKgatewayParameters to it is how you configure the
+# shared extensions for every Gateway of the class.
+#
+# Note the controller name: solo.io/enterprise-kgateway, not the OSS
+# kgateway.dev/kgateway. A Gateway opts in with
+# `gatewayClassName: enterprise-kgateway`.
+#
+# You can also create your own class on the same controller to get a dedicated
+# set of ext auth / rate limit / Redis deployments per team.
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: kgateway
+  name: enterprise-kgateway
 spec:
-  controllerName: kgateway.dev/kgateway
+  controllerName: solo.io/enterprise-kgateway
   parametersRef:
     group: enterprisekgateway.solo.io
     kind: EnterpriseKgatewayParameters
