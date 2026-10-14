@@ -1,0 +1,30 @@
+# TCP listener and route. Kept in the demo namespace so no ReferenceGrant is
+# needed and `kubectl delete ns keepalive-demo` cleans everything up.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tcp-keepalive
+  namespace: keepalive-demo
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - name: tcp
+    protocol: TCP
+    port: 9000
+    allowedRoutes:
+      kinds:
+      - kind: TCPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-server
+  namespace: keepalive-demo
+spec:
+  parentRefs:
+  - name: tcp-keepalive
+    sectionName: tcp
+  rules:
+  - backendRefs:
+    - name: tcp-server
+      port: 9000

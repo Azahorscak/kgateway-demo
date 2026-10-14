@@ -1,0 +1,17 @@
+# Downstream (client -> gateway) keepalive, kgateway 2.3+. Same 25s budget.
+# Envoy: listener.tcp_keepalive
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: downstream-keepalive
+  namespace: keepalive-demo
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: tcp-keepalive
+  default:
+    tcpKeepalive:
+      keepAliveTime: 10s
+      keepAliveInterval: 5s
+      keepAliveProbes: 3
