@@ -1,0 +1,35 @@
+# An in-mesh client for testing east-west policy:
+#   kubectl exec -n curl deploy/curl -- curl -s httpbin.httpbin:8000/headers
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: curl
+  labels:
+    istio.io/dataplane-mode: ambient
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: curl
+  namespace: curl
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: curl
+  namespace: curl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curl
+  template:
+    metadata:
+      labels:
+        app: curl
+    spec:
+      serviceAccountName: curl
+      containers:
+      - name: curl
+        image: curlimages/curl:8.11.1
+        command: ["sleep", "infinity"]

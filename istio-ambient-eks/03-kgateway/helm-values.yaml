@@ -1,0 +1,7 @@
+# Values for the kgateway Helm chart.
+controller:
+  extraEnv:
+    # Makes the controller read Istio resources (DestinationRule, ServiceEntry)
+    # and honour istio.io/ingress-use-waypoint on Services. Ambient mTLS itself
+    # comes from the namespace label, not from this flag.
+    KGW_ENABLE_ISTIO_INTEGRATION: "true"

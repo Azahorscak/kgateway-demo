@@ -1,0 +1,10 @@
+# Values for istio/ztunnel.
+profile: ambient
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# info is fine for a demo; "info,access=debug" logs every connection.
+logLevel: info

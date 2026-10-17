@@ -5,8 +5,9 @@ open source project gives you and what Solo's enterprise distribution adds on
 top.
 
 ```
-oss/          kgateway (open source, Apache 2.0)
-enterprise/   Solo Enterprise for kgateway
+oss/                kgateway (open source, Apache 2.0)
+enterprise/         Solo Enterprise for kgateway
+istio-ambient-eks/  kgateway as ingress for an Istio ambient mesh on EKS
 ```
 
 Every distinct example is its own subdirectory with the manifests and a short

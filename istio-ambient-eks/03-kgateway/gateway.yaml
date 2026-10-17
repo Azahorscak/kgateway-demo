@@ -1,0 +1,22 @@
+# The ingress Gateway. kgateway names the proxy Deployment, Service and
+# ServiceAccount after it, so its mesh identity is
+# spiffe://cluster.local/ns/kgateway-system/sa/http.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: http
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  infrastructure:
+    parametersRef:
+      name: eks-nlb
+      group: gateway.kgateway.dev
+      kind: GatewayParameters
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: All

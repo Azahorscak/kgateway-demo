@@ -1,0 +1,40 @@
+# eksctl config for a small demo cluster.
+#
+#   eksctl create cluster -f cluster.yaml
+#
+# Nothing in here is ambient-specific except the add-ons: the AWS VPC CNI is
+# kept as the primary CNI (istio-cni chains onto it), and the AWS Load
+# Balancer Controller's IAM role is created so the kgateway Service can get an
+# NLB.
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: ambient-kgateway
+  region: us-west-2
+  version: "1.33"
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+
+addons:
+- name: vpc-cni
+- name: coredns
+- name: kube-proxy
+- name: eks-pod-identity-agent
+
+managedNodeGroups:
+- name: default
+  instanceType: m6i.large
+  desiredCapacity: 3
+  minSize: 3
+  maxSize: 5
+  # ztunnel is a DaemonSet; spread nodes across AZs so the zone-aware routing
+  # examples in oss/08-gateway-config/ have something to show.
+  availabilityZones: [us-west-2a, us-west-2b, us-west-2c]
+  privateNetworking: true

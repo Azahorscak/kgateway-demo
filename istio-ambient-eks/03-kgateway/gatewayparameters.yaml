@@ -1,0 +1,19 @@
+# Fronts the kgateway proxy with an internet-facing NLB via the AWS Load
+# Balancer Controller. IP targets send traffic straight to the proxy pods,
+# skipping the NodePort hop.
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayParameters
+metadata:
+  name: eks-nlb
+  namespace: kgateway-system
+spec:
+  kube:
+    service:
+      type: LoadBalancer
+      extraAnnotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: external
+        service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+        service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    deployment:
+      replicas: 2

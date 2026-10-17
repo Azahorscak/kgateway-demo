@@ -1,0 +1,17 @@
+# Only the kgateway proxy may open connections to httpbin. Enforced by ztunnel
+# on the destination node, using the identity from the mTLS handshake.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-ingress-only
+  namespace: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/kgateway-system/sa/http

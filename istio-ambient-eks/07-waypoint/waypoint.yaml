@@ -1,0 +1,24 @@
+# Equivalent to: istioctl waypoint apply -n httpbin --enroll-namespace
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: waypoint
+  namespace: httpbin
+  labels:
+    istio.io/waypoint-for: service
+spec:
+  gatewayClassName: istio-waypoint
+  listeners:
+  - name: mesh
+    port: 15008
+    protocol: HBONE
+---
+# Route every Service in the namespace through the waypoint. Re-applies the
+# ambient label from 04-sample-apps/ so this manifest does not drop it.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: httpbin
+  labels:
+    istio.io/dataplane-mode: ambient
+    istio.io/use-waypoint: waypoint
