@@ -1,0 +1,17 @@
+# Values for istio/istiod.
+profile: ambient
+
+# EKS needs no platform override (unlike gke, k3d, minikube, openshift).
+# global:
+#   platform: ""
+
+pilot:
+  autoscaleMin: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+meshConfig:
+  # Access logs from waypoints (ztunnel logs connections on its own).
+  accessLogFile: /dev/stdout
