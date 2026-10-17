@@ -6,7 +6,7 @@
 | `02-listeners/` | HTTPS, SNI, mTLS, TCP, TLS passthrough, listener sets |
 | `03-traffic-management/` | matching, splits, redirects, rewrites, headers, transformations, delegation, ext proc, CORS |
 | `04-backends/` | static hosts, AWS Lambda, dynamic forward proxy, backend TLS, priority failover |
-| `05-resiliency/` | retries, timeouts, circuit breakers, outlier detection, health checks, fault injection, mirroring |
+| `05-resiliency/` | retries, timeouts, circuit breakers, outlier detection, health checks, fault injection, mirroring, TCP keepalive test |
 | `06-security/` | JWT, RBAC, external auth, rate limiting, IP ACLs, CSRF |
 | `07-observability/` | access logging, OpenTelemetry tracing |
 | `08-gateway-config/` | GatewayParameters, autoscaling, zone-aware routing, policy attachment |

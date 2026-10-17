@@ -1,0 +1,17 @@
+# Upstream (gateway -> tcp-server) keepalive. Short values so a dead backend is
+# detected in keepAliveTime + keepAliveProbes * keepAliveInterval = 10 + 3*5 = 25s.
+# Envoy: cluster.upstream_connection_options.tcp_keepalive
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: upstream-keepalive
+  namespace: keepalive-demo
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: tcp-server
+  tcpKeepalive:
+    keepAliveTime: 10s
+    keepAliveInterval: 5s
+    keepAliveProbes: 3

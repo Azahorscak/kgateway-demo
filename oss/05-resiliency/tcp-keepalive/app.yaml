@@ -1,0 +1,170 @@
+# Test app for the TCP keepalive demo.
+#
+#   tcp-client --> Gateway tcp-keepalive (TCP :9000) --> tcp-server:9000
+#
+# Both apps are plain Python with keepalive OFF on their own sockets, so any
+# keepalive probe on the wire comes from the gateway. Each pod has a netshoot
+# sidecar (NET_ADMIN) for tcpdump, ss, and iptables to black-hole the pod.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keepalive-demo
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keepalive-app
+  namespace: keepalive-demo
+data:
+  server.py: |
+    # Line echo server. Logs OPEN/HELLO/CLOSE with connection lifetime, so a
+    # close the gateway initiates shows up with how long it took.
+    import asyncio, os, time
+
+    def log(msg):
+        print(f"{time.strftime('%H:%M:%S')} {msg}", flush=True)
+
+    async def handle(reader, writer):
+        peer = "%s:%s" % writer.get_extra_info("peername")[:2]
+        start, conn_id, reason = time.monotonic(), "-", "eof"
+        log(f"OPEN peer={peer}")
+        try:
+            while line := await reader.readline():
+                text = line.decode(errors="replace").strip()
+                if text.startswith("hello "):
+                    conn_id = text.split()[1]
+                    log(f"HELLO id={conn_id} peer={peer}")
+                writer.write(line)
+                await writer.drain()
+        except OSError as e:
+            reason = type(e).__name__
+        finally:
+            log(f"CLOSE id={conn_id} peer={peer} duration={time.monotonic() - start:.1f}s reason={reason}")
+            writer.close()
+
+    async def main():
+        port = int(os.environ.get("PORT", "9000"))
+        server = await asyncio.start_server(handle, "0.0.0.0", port)
+        log(f"listening on :{port}")
+        async with server:
+            await server.serve_forever()
+
+    asyncio.run(main())
+  client.py: |
+    # Opens one connection, says hello, then sits idle until the connection is
+    # closed or --max-wait passes.
+    #   exit 0: CLOSED after=<seconds>   exit 2: STILL_OPEN after max-wait
+    import argparse, socket, sys, time, uuid
+
+    p = argparse.ArgumentParser()
+    p.add_argument("--host", default="tcp-keepalive.keepalive-demo.svc.cluster.local")
+    p.add_argument("--port", type=int, default=9000)
+    p.add_argument("--id", default=uuid.uuid4().hex[:8])
+    p.add_argument("--max-wait", type=float, default=120)
+    a = p.parse_args()
+
+    def log(msg):
+        print(f"{time.strftime('%H:%M:%S')} {msg}", flush=True)
+
+    s = socket.create_connection((a.host, a.port), timeout=10)
+    s.sendall(f"hello {a.id}\n".encode())
+    echo = b""
+    while not echo.endswith(b"\n"):
+        chunk = s.recv(64)
+        if not chunk:
+            sys.exit(f"connection closed before echo (id={a.id})")
+        echo += chunk
+    start = time.monotonic()
+    log(f"CONNECTED id={a.id} local={s.getsockname()[0]}:{s.getsockname()[1]} idle, waiting up to {a.max_wait:.0f}s")
+
+    s.settimeout(a.max_wait)
+    try:
+        data = s.recv(1)
+        reason = "eof" if not data else "unexpected-data"
+    except socket.timeout:
+        log(f"STILL_OPEN id={a.id} after={time.monotonic() - start:.1f}s")
+        sys.exit(2)
+    except OSError as e:
+        reason = type(e).__name__
+    log(f"CLOSED id={a.id} after={time.monotonic() - start:.1f}s reason={reason}")
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcp-server
+  namespace: keepalive-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tcp-server
+  template:
+    metadata:
+      labels:
+        app: tcp-server
+    spec:
+      containers:
+      - name: server
+        image: python:3.12-alpine
+        command: ["python", "-u", "/app/server.py"]
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      - name: netshoot
+        image: nicolaka/netshoot:v0.13
+        command: ["sleep", "infinity"]
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW"]
+      volumes:
+      - name: app
+        configMap:
+          name: keepalive-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-server
+  namespace: keepalive-demo
+spec:
+  selector:
+    app: tcp-server
+  ports:
+  - name: tcp
+    port: 9000
+    targetPort: 9000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcp-client
+  namespace: keepalive-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tcp-client
+  template:
+    metadata:
+      labels:
+        app: tcp-client
+    spec:
+      containers:
+      - name: client
+        image: python:3.12-alpine
+        command: ["sleep", "infinity"]
+        volumeMounts:
+        - name: app
+          mountPath: /app
+      - name: netshoot
+        image: nicolaka/netshoot:v0.13
+        command: ["sleep", "infinity"]
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "NET_RAW"]
+      volumes:
+      - name: app
+        configMap:
+          name: keepalive-app
