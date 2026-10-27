@@ -1,0 +1,10 @@
+# Values for istio/cni. istio-cni chains onto the AWS VPC CNI; it does not
+# replace it.
+profile: ambient
+
+cni:
+  # Do not touch system pods. kgateway-system is deliberately NOT listed: the
+  # gateway is enrolled in ambient so its upstream traffic gets mTLS.
+  excludeNamespaces:
+  - kube-system
+  - istio-system

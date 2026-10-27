@@ -1,0 +1,48 @@
+# L7 policy, enforced by the waypoint because it targets the Service rather
+# than selecting pods.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-l7
+  namespace: httpbin
+spec:
+  targetRefs:
+  - kind: Service
+    group: ""
+    name: httpbin
+  action: ALLOW
+  rules:
+  # The ingress gateway: read-only.
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/kgateway-system/sa/http
+    to:
+    - operation:
+        methods: ["GET", "HEAD"]
+  # The in-mesh client: one path.
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/curl/sa/curl
+    to:
+    - operation:
+        paths: ["/headers"]
+---
+# With a waypoint in front, the pods themselves should only accept traffic that
+# came through it. ztunnel enforces this at L4.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: httpbin-from-waypoint
+  namespace: httpbin
+spec:
+  selector:
+    matchLabels:
+      app: httpbin
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/httpbin/sa/waypoint

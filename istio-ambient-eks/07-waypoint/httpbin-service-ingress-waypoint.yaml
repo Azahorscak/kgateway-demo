@@ -1,0 +1,18 @@
+# Same Service as 04-sample-apps/httpbin.yaml, with one added label: send
+# traffic from the ingress gateway through the namespace waypoint too.
+apiVersion: v1
+kind: Service
+metadata:
+  name: httpbin
+  namespace: httpbin
+  labels:
+    app: httpbin
+    service: httpbin
+    istio.io/ingress-use-waypoint: "true"
+spec:
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8080
+  selector:
+    app: httpbin
