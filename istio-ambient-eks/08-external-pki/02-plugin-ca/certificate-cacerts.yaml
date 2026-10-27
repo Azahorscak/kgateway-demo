@@ -1,0 +1,37 @@
+# Pattern 1: PCA issues istiod's signing intermediate into the `cacerts`
+# Secret. istiod reads tls.crt / tls.key / ca.crt from it (the
+# kubernetes.io/tls layout is accepted alongside Istio's own *.pem names).
+#
+# Apply BEFORE installing istiod, otherwise istiod self-signs a root.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cacerts
+  namespace: istio-system
+spec:
+  secretName: cacerts
+  isCA: true                    # issuer uses SubordinateCACertificate_PathLen0/V1
+  commonName: ambient-kgateway istiod intermediate
+  subject:
+    organizations: [example-org]
+  # Short enough to limit exposure of a key held in etcd, long enough to ride
+  # out a PCA outage. Must fit inside the PCA subordinate's own validity.
+  duration: 720h                # 30d
+  renewBefore: 240h             # renew with 10d left
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    rotationPolicy: Always
+  usages:
+  - cert sign
+  - crl sign
+  - digital signature
+  issuerRef:
+    group: awspca.cert-manager.io
+    kind: AWSPCAClusterIssuer
+    name: aws-pca

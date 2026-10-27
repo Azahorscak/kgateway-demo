@@ -1,0 +1,9 @@
+# Overlay for istio/ztunnel when istio-csr is the CA. Use together with
+# ../../02-istio-ambient/ztunnel-values.yaml:
+#
+#   helm upgrade -i ztunnel istio/ztunnel -n istio-system --version $ISTIO_VERSION \
+#     -f ../../02-istio-ambient/ztunnel-values.yaml -f ztunnel-values.yaml --wait
+#
+# ztunnel does not read global.caAddress from the istiod chart; it has its own.
+# xDS still comes from istiod (xdsAddress unchanged).
+caAddress: cert-manager-istio-csr.cert-manager.svc:443

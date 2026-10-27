@@ -33,6 +33,7 @@ the gateway (`cluster.local/ns/kgateway-system/sa/http`) that you can write
 | `05-ingress/` | the `HTTPRoute` from kgateway to httpbin |
 | `06-mesh-security/` | STRICT mTLS and an L4 `AuthorizationPolicy` that only lets the gateway in |
 | `07-waypoint/` | an Istio waypoint for L7 policy, and making ingress traffic use it |
+| `08-external-pki/` | mesh certificates from AWS Private CA with the root of trust outside the cluster: plug-in CA, and istio-csr |
 
 ## Order of operations
 
@@ -46,6 +47,8 @@ eksctl create cluster -f 01-eks-cluster/cluster.yaml
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
 
 # 3. Istio ambient — see 02-istio-ambient/README.md for the four helm installs
+#    (for a root of trust outside the cluster, do 08-external-pki/ first:
+#    it changes how istiod and ztunnel are installed)
 
 # 4. kgateway — see 03-kgateway/README.md
 kubectl label namespace kgateway-system istio.io/dataplane-mode=ambient

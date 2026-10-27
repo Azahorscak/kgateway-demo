@@ -1,0 +1,45 @@
+# Pattern 2 only: a cluster-local CA, whose certificate PCA issues, that
+# cert-manager uses to sign workload certificates on istio-csr's behalf.
+# istiod never sees this key.
+#
+# istio-csr creates its CertificateRequests in istio-system
+# (app.certmanager.namespace), so the namespaced Issuer lives there too.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: istio-ca
+  namespace: istio-system
+spec:
+  secretName: istio-ca
+  isCA: true                    # issuer uses SubordinateCACertificate_PathLen0/V1
+  commonName: ambient-kgateway mesh intermediate
+  subject:
+    organizations: [example-org]
+  duration: 720h                # 30d
+  renewBefore: 240h
+  privateKey:
+    algorithm: RSA
+    size: 2048
+    rotationPolicy: Always
+  usages:
+  - cert sign
+  - crl sign
+  - digital signature
+  issuerRef:
+    group: awspca.cert-manager.io
+    kind: AWSPCAClusterIssuer
+    name: aws-pca
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: istio-ca
+  namespace: istio-system
+spec:
+  ca:
+    secretName: istio-ca

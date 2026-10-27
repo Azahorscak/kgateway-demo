@@ -1,0 +1,15 @@
+# Pattern 3 overlay: every workload certificate is signed by AWS PCA.
+#
+#   helm upgrade -i ... -f istio-csr-values.yaml -f istio-csr-values-pca-direct.yaml
+app:
+  certmanager:
+    issuer:
+      name: aws-pca-short-lived
+      kind: AWSPCAClusterIssuer
+      group: awspca.cert-manager.io
+  server:
+    # Each renewal is a billed PCA certificate and an IssueCertificate call
+    # counted against the account's rate quota. ztunnel renews at roughly
+    # half-life, so 24h means ~2 certificates per identity per node per day
+    # instead of ~48 at 1h. Must stay within the short-lived CA's 7-day limit.
+    maxCertificateDuration: 24h

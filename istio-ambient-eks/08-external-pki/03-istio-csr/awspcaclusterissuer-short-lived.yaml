@@ -1,0 +1,16 @@
+# Pattern 3 only: a second issuer for a PCA subordinate created with
+#   --usage-mode SHORT_LIVED_CERTIFICATE
+# (validity <= 7 days, cheaper per certificate). Keep the general-purpose
+# subordinate from 01-aws-pca-issuer/ for anything long-lived.
+#
+#   envsubst < awspcaclusterissuer-short-lived.yaml | kubectl apply -f -
+apiVersion: awspca.cert-manager.io/v1beta1
+kind: AWSPCAClusterIssuer
+metadata:
+  name: aws-pca-short-lived
+spec:
+  arn: ${SHORT_LIVED_CA_ARN}
+  region: ${AWS_REGION}
+  # PCA backdates NotBefore by 1h unless told otherwise; on a 24h cert that
+  # pulls renewal forward. Keep the backdate small.
+  notBeforeOffset: 5m

@@ -1,0 +1,15 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AwsPcaIssuer",
+      "Effect": "Allow",
+      "Action": [
+        "acm-pca:DescribeCertificateAuthority",
+        "acm-pca:GetCertificate",
+        "acm-pca:IssueCertificate"
+      ],
+      "Resource": "arn:aws:acm-pca:us-west-2:111122223333:certificate-authority/REPLACE-ME"
+    }
+  ]
+}
