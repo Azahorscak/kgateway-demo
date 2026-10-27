@@ -1,0 +1,16 @@
+# Cluster-scoped issuer backed by the AWS PCA subordinate CA. Every pattern in
+# this section points at it.
+#
+#   envsubst < awspcaclusterissuer.yaml | kubectl apply -f -
+apiVersion: awspca.cert-manager.io/v1beta1
+kind: AWSPCAClusterIssuer
+metadata:
+  name: aws-pca
+spec:
+  arn: ${SUB_CA_ARN}
+  region: ${AWS_REGION}
+  # CA in another account: a role there that the issuer's IRSA role may assume.
+  # role: arn:aws:iam::<security-account>:role/pca-issuer
+  #
+  # Do NOT set pcaTemplate.defaultTemplateName here: it would override the
+  # PathLen0 subordinate template the issuer picks for isCA certificates.

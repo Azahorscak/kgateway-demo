@@ -36,4 +36,7 @@ istioctl ztunnel-config workloads         # once apps are enrolled
 
 There is no ingress gateway chart here on purpose — kgateway is the ingress.
 
+For mesh certificates from AWS Private CA (root of trust outside the cluster),
+set that up first — see `../08-external-pki/`.
+
 Docs: <https://istio.io/latest/docs/ambient/install/helm/>

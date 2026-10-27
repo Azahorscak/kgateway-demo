@@ -1,0 +1,44 @@
+# Values for jetstack/cert-manager-istio-csr, Pattern 2 (local CA Issuer).
+# For Pattern 3 add istio-csr-values-pca-direct.yaml on top.
+
+app:
+  certmanager:
+    # Where CertificateRequests are created, for workload certs and for
+    # istio-csr's own serving cert.
+    namespace: istio-system
+    issuer:
+      name: istio-ca
+      kind: Issuer
+      group: cert-manager.io
+
+  tls:
+    trustDomain: cluster.local
+    # Pin the trust anchor instead of trusting whatever ca.crt the issuer
+    # returns. This PEM is written to the istio-ca-root-cert ConfigMap in
+    # every namespace. During a root migration, put both roots in it.
+    rootCAFile: /var/certs/ca.pem
+    # Create istiod's xDS serving cert (Secret istio-system/istiod-tls). The
+    # istiod chart mounts it automatically when present.
+    istiodCertificateEnable: true
+
+  server:
+    # Ambient: ztunnel requests certs for every pod on its node, i.e. for
+    # identities other than its own. Without this, those CSRs are rejected.
+    caTrustedNodeAccounts: istio-system/ztunnel
+    # istio-csr requests min(this, what the client asked for). ztunnel asks
+    # for 24h; the default cap of 1h is fine when a local CA signs.
+    maxCertificateDuration: 1h
+
+  istio:
+    revisions: ["default"]
+    namespace: istio-system
+
+# The pinned root, from the Secret created in README.md.
+volumes:
+- name: root-ca
+  secret:
+    secretName: istio-root-ca
+volumeMounts:
+- name: root-ca
+  mountPath: /var/certs
+  readOnly: true

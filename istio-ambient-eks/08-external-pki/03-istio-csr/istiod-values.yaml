@@ -1,0 +1,14 @@
+# Overlay for istio/istiod when istio-csr is the CA. Use together with
+# ../../02-istio-ambient/istiod-values.yaml:
+#
+#   helm upgrade -i istiod istio/istiod -n istio-system --version $ISTIO_VERSION \
+#     -f ../../02-istio-ambient/istiod-values.yaml -f istiod-values.yaml --wait
+global:
+  # Injected proxies (waypoints, any sidecars) send CSRs here instead of istiod.
+  caAddress: cert-manager-istio-csr.cert-manager.svc:443
+
+pilot:
+  env:
+    # Turn off istiod's built-in CA. istiod then serves xDS with the
+    # istiod-tls cert istio-csr created, and holds no signing key.
+    ENABLE_CA_SERVER: "false"
